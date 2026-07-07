@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Cuenta regresiva</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    text-align: center;
+}
+
+/* CANVAS */
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
+
+/* CONTENIDO */
+.container {
+    background: rgba(255, 240, 245, 0.85);
+    padding: 50px 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(255, 77, 136, 0.3);
+    width: 92%;
+    max-width: 600px;
+    position: relative;
+    z-index: 1;
+    backdrop-filter: blur(8px);
+}
+
+/* TEXTO */
+h1 {
+    font-size: 1.6em;
+    color: #ff5c8a;
+}
+
+.name {
+    margin-bottom: 20px;
+}
+
+.frase-principal {
+    font-family: 'Georgia', serif;
+    margin-bottom: 10px;
+}
+
+.frase-secundaria {
+    font-family: 'Georgia', serif;
+    margin-bottom: 25px;
+}
+
+/* CONTADOR */
+.time {
+    display: flex;
+    gap: 10px;
+}
+
+.box {
+    background: rgba(255,255,255,0.7);
+    padding: 15px;
+    border-radius: 12px;
+    flex: 1;
+}
+
+.number {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #ff4d88;
+    display: inline-block;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* ANIMACIONES NUMEROS */
+.flip {
+    transform: rotateX(90deg);
+    opacity: 0;
+}
+
+.glow {
+    text-shadow: 0 0 8px #ff4d88, 0 0 15px #ff99cc;
+}
+
+.label {
+    font-size: 0.7em;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="container">
+    <h1>💖 Cuenta regresiva 💖</h1>
+
+    <div class="name">
+        Para el cumpleaños de la cansona con los ojos más bonitos<br>
+        <strong>Anny Jannit Samudio Pérez</strong>
+    </div>
+
+    <div class="frase-principal">
+        Eres de esas historias que uno no sabía que quería leer… hasta que aparecen
+    </div>
+
+    <div class="frase-secundaria">
+        Y entre todas las historias posibles, me alegra coincidir en la misma página contigo
+    </div>
+
+    <div class="time">
+        <div class="box"><div id="days" class="number">0</div><div class="label">Días</div></div>
+        <div class="box"><div id="hours" class="number">0</div><div class="label">Horas</div></div>
+        <div class="box"><div id="minutes" class="number">0</div><div class="label">Min</div></div>
+        <div class="box"><div id="seconds" class="number">0</div><div class="label">Seg</div></div>
+    </div>
+</div>
+
+<script>
+// ===== CUENTA REGRESIVA =====
+const birthday = new Date(Date.now() + 5000);
+
+function updateElement(id, value) {
+    const el = document.getElementById(id);
+
+    if (el.textContent != value) {
+        el.classList.add("flip");
+
+        setTimeout(() => {
+            el.textContent = value;
+            el.classList.remove("flip");
+
+            el.classList.add("glow");
+            setTimeout(() => el.classList.remove("glow"), 300);
+        }, 150);
+    }
+}
+
+function updateCountdown() {
+    const now = new Date();
+    const diff = birthday - now;
+
+    if (diff <= 0) {
+        document.querySelector(".container").innerHTML = `
+            <h1>💖 Feliz cumpleaños 💖</h1>
+            <p>Y hoy empieza un nuevo capítulo<br><strong>Anny</strong></p>
+        `;
+        return;
+    }
+
+    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const m = Math.floor((diff / (1000 * 60)) % 60);
+    const s = Math.floor((diff / 1000) % 60);
+
+    updateElement("days", d);
+    updateElement("hours", h);
+    updateElement("minutes", m);
+    updateElement("seconds", s);
+}
+
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+// ===== MATRIX =====
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const text = "Linda";
+const fontSize = 28;
+const spacing = 7;
+const speed = 2;
+
+const columns = canvas.width / spacing;
+const drops = Array(Math.floor(columns)).fill(0).map(() => Math.random() * canvas.height);
+
+function getColor() {
+    const colors = ["#ff4da6", "#ff66cc", "#ff99cc", "#ff1a75"];
+    return colors[Math.floor(Math.random() * colors.length)];
+}
+
+function drawMatrix() {
+    ctx.fillStyle = "rgba(0,0,0,0.08)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.font = fontSize + "px monospace";
+
+    for (let i = 0; i < drops.length; i++) {
+        let x = i * spacing;
+        let y = drops[i];
+
+        ctx.fillStyle = getColor();
+        ctx.fillText(text, x, y);
+
+        if (y > canvas.height && Math.random() > 0.985) {
+            drops[i] = 0;
+        }
+
+        drops[i] += speed;
+    }
+}
+
+// ===== EXPLOSIONES =====
+let particles = [];
+
+function createExplosion(x, y) {
+    for (let i = 0; i < 120; i++) {
+        particles.push({
+            x: x,
+            y: y,
+            dx: (Math.random() - 0.5) * 12,
+            dy: (Math.random() - 0.5) * 12,
+            life: 120,
+            type: Math.random() > 0.6 ? "text" : "spark"
+        });
+    }
+}
+
+function drawParticles() {
+    for (let i = 0; i < particles.length; i++) {
+        let p = particles[i];
+
+        if (p.type === "spark") {
+            ctx.fillStyle = "#ff99cc";
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+        } else {
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "14px monospace";
+            ctx.fillText("Mi cansona", p.x, p.y);
+        }
+
+        p.x += p.dx;
+        p.y += p.dy;
+        p.life--;
+
+        if (p.life <= 0) {
+            particles.splice(i, 1);
+            i--;
+        }
+    }
+}
+
+window.addEventListener("click", (e) => {
+    createExplosion(e.clientX, e.clientY);
+});
+
+// LOOP
+function animate() {
+    drawMatrix();
+    drawParticles();
+    requestAnimationFrame(animate);
+}
+animate();
+
+// RESPONSIVE
+window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+</script>
+
+</body>
+</html>
