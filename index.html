@@ -147,10 +147,9 @@ function updateCountdown() {
     const now = new Date();
     const diff = birthday - now;
 
-    if (diff <= 0) {
-        document.querySelector(".container").innerHTML = `
-            <h1>💖 Feliz cumpleaños 💖</h1>
-            <p>Hoy el tiempo dejó de contar porque, por fin, llegó tu día.
+   if (diff <= 0) {
+
+    const mensaje = `Hoy el tiempo dejó de contar porque, por fin, llegó tu día.
 
 Gracias por cada conversación que terminó durando mucho más de lo planeado, por cada risa compartida, por esos silencios que nunca se sintieron incómodos y por cada momento en el que, sin saberlo, hiciste mis días un poquito más bonitos.
 
@@ -166,10 +165,78 @@ Y si alguna vez llegas a dudar de ti, recuerda que existe alguien que, cada vez 
 
 Feliz cumpleaños, Anny.
 
-Gracias por existir. ❤️<br><strong>Anny</strong></p>
-        `;
-        return;
+Gracias por existir. ❤️`;
+
+    document.querySelector(".container").innerHTML = `
+        <div style="
+            background:rgba(255,255,255,.45);
+            padding:35px;
+            border-radius:20px;
+            backdrop-filter:blur(8px);
+            max-height:75vh;
+            overflow-y:auto;
+        ">
+
+            <h1 style="
+                font-size:2.3em;
+                color:#ff4d88;
+                margin-bottom:5px;
+            ">
+                🎉 ¡Feliz cumpleaños! 🎉
+            </h1>
+
+            <h2 style="
+                color:#d63384;
+                margin-top:0;
+                margin-bottom:25px;
+            ">
+                Anny Jannit Samudio Pérez
+            </h2>
+
+            <div style="
+                width:90px;
+                height:3px;
+                background:#ff8ab8;
+                margin:20px auto 35px;
+                border-radius:20px;
+            "></div>
+
+            <div id="carta" style="
+                text-align:left;
+                font-family:Georgia,serif;
+                font-size:18px;
+                color:#444;
+                line-height:2;
+                white-space:pre-wrap;
+            "></div>
+
+        </div>
+    `;
+
+    const carta = document.getElementById("carta");
+
+    let i = 0;
+
+    function escribir() {
+
+        if (i < mensaje.length) {
+
+            carta.textContent += mensaje.charAt(i);
+
+            carta.scrollTop = carta.scrollHeight;
+
+            i++;
+
+            setTimeout(escribir, 22);
+
+        }
+
     }
+
+    escribir();
+
+    return;
+}
 
     const d = Math.floor(diff / (1000 * 60 * 60 * 24));
     const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
